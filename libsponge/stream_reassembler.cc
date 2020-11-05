@@ -138,9 +138,9 @@ long StreamReassembler::merge_node(node &node1, const node &node2) {
         size_t gap = node2.begin - node1.begin;
         size_t merged = front.length - gap;
         // 截取 front 的前半段
-        front.data = front.data.substr(0, gap) + back.data;
-        front.length = gap + back.length;
-        node1 = front;
+        node1.begin = front.begin;
+        node1.data = front.data.substr(0, gap) + back.data;
+        node1.length = gap + back.length;
         // 注意，如果 front 和 back 没有交集，则这里的 merged 是 0
         // 所以 0 不能当做判断的理由
         return merged;
