@@ -25,9 +25,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // 合并完成以后检查能否插入进  _output
     // 如果当前的序号大于 头节点的序号 + 容量，表示越界了，所以直接返回
     // 这里 _head_index 表示已经第一个字节的序号
-    if (index >= _head_index + _capacity) {
-        return;
-    }
+    // if (index >= _head_index + _capacity) {
+    //     return;
+    // }
     // lower_bound
     // 二分查找一个有序数列，返回第一个大于等于x的数，如果没找到，返回末尾的迭代器位置
     node elem;
@@ -111,38 +111,28 @@ size_t StreamReassembler::unassembled_bytes() const { return _unassembled_byte; 
 bool StreamReassembler::empty() const { return _unassembled_byte == 0; }
 
 long StreamReassembler::merge_node(node &node1, const node &node2) {
-    // 合并 node1 和 node2，将合并的数据存储在 node1 中
-    // 判断 node1 和 node2 谁在前面
-    node front, back;
-    if (node1.begin < node2.begin) {
-        front = node1;
-        back = node2;
+    node x, y;
+    // 决定 node1 和 node2 谁在前面
+    if (node1.begin > node2.begin) {
+        x = node2;
+        y = node1;
     } else {
-        front = node2;
-        back = node1;
+        x = node1;
+        y = node2;
     }
-    // 现在 front 在前面，而 back 在后面
-    // 如果 front.begin + front.length < back.begin
-    // 即 front 与 back 之间没有交集
-    if (front.begin + front.length < back.begin) {
-        // 压根合并不了，直接返回，并且返回 -1
+    // 如果 x 的 最右边 仍然在 y 的左边，则二者根本没有交集，所以直接返回 -1
+    if (x.begin + x.length < y.begin) {
         return -1;
-    } else if (front.begin + front.length >= back.begin + back.length) {
-        // 如果 front.begin + front.length >= back.begin + back.length
-        // 即 front 完全能够包裹 back，所以无需合并，直接返回 back.length
-        node1 = front;
-        // back 的数据已经有了，因此要剪掉重复的部分数据，所以返回 back.length
-        return back.length;
+    } else if (x.begin + x.length >= y.begin + y.length) {
+        // 如果 x 的右边在 y 右边的 右边，所以 y 直接被 x 覆盖，因此直接返回 y 的长度
+        // 故 y 的数据是多余的
+        node1 = x;
+        return y.length;
     } else {
-        // node1 和 node2 有交集
-        size_t gap = node2.begin - node1.begin;
-        size_t merged = front.length - gap;
-        // 截取 front 的前半段
-        node1.begin = front.begin;
-        node1.data = front.data.substr(0, gap) + back.data;
-        node1.length = gap + back.length;
-        // 注意，如果 front 和 back 没有交集，则这里的 merged 是 0
-        // 所以 0 不能当做判断的理由
-        return merged;
+        // 这个时候 x 的右边大于 y 的左边，但小于 y 的右边
+        node1.begin = x.begin;
+        node1.data = x.data + y.data.substr(x.begin + x.length - y.begin);
+        node1.length = node1.data.length();
+        return x.begin + x.length - y.begin;
     }
 }
