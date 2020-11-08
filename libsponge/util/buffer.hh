@@ -11,6 +11,7 @@
 #include <vector>
 
 //! \brief A reference-counted read-only string that can discard bytes from the front
+// 引用计数，只读的字符串，可以从头部来丢弃字节
 class Buffer {
   private:
     std::shared_ptr<std::string> _storage{};

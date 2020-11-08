@@ -9,16 +9,18 @@
 #include <utility>
 
 //! The result of parsing or unparsing an IP datagram or TCP segment
+// 枚举类，解析 IP 和 TCP 包
 enum class ParseResult {
     NoError = 0,      //!< Success
-    BadChecksum,      //!< Bad checksum
-    PacketTooShort,   //!< Not enough data to finish parsing
-    WrongIPVersion,   //!< Got a version of IP other than 4
-    HeaderTooShort,   //!< Header length is shorter than minimum required
-    TruncatedPacket,  //!< Packet length is shorter than header claims
+    BadChecksum,      //!< Bad checksum 校验失败
+    PacketTooShort,   //!< Not enough data to finish parsing 数据太少
+    WrongIPVersion,   //!< Got a version of IP other than 4 目前只支持 IPV4，其它版本报错
+    HeaderTooShort,   //!< Header length is shorter than minimum required 小于最小头部长度
+    TruncatedPacket,  //!< Packet length is shorter than header claims 小于最小头部
 };
 
 //! Output a string representation of a ParseResult
+// 将 ParseResult 转化为字符串
 std::string as_string(const ParseResult r);
 
 class NetParser {
@@ -30,6 +32,7 @@ class NetParser {
     void _check_size(const size_t size);
 
     //! Generic integer parsing method (used by u32, u16, u8)
+    // 解析整形，泛型，强大的泛型
     template <typename T>
     T _parse_int();
 
@@ -58,6 +61,7 @@ class NetParser {
     uint8_t u8();
 
     //! Remove n bytes from the buffer
+    // 从缓冲区中溢出前缀
     void remove_prefix(const size_t n);
 };
 

@@ -13,10 +13,11 @@ string as_string(const ParseResult r) {
         "HeaderTooShort",
         "TruncatedPacket",
     };
-
+    // ParseResult 实际上是 0~6 的枚举，因此需要使用 static_cast 来转换一下
     return _names[static_cast<size_t>(r)];
 }
 
+// 检查数据是不是大少了
 void NetParser::_check_size(const size_t size) {
     if (size > _buffer.size()) {
         set_error(ParseResult::PacketTooShort);

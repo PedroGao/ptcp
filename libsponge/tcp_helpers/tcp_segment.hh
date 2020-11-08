@@ -9,8 +9,8 @@
 //! \brief [TCP](\ref rfc::rfc793) segment
 class TCPSegment {
   private:
-    TCPHeader _header{};
-    Buffer _payload{};
+    TCPHeader _header{};  // TCP 头
+    Buffer _payload{};    // TCP body
 
   public:
     //! \brief Parse the segment from a string
