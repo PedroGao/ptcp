@@ -16,9 +16,13 @@
 class TCPReceiver {
     //! Our data structure for re-assembling bytes.
     StreamReassembler _reassembler;
+    // 是否 SYN
     bool _syn{};
+    // 是否 FIN
     bool _fin{};
+    // 已经发送的字节数，绝对序号
     size_t _base = 0;
+    // 初始化序号
     size_t _isn = 0;
     //! The maximum number of bytes we'll store.
     size_t _capacity;
@@ -38,6 +42,7 @@ class TCPReceiver {
     //!
     //! This is the beginning of the receiver's window, or in other words, the sequence number
     //! of the first byte in the stream that the receiver hasn't received.
+    // 返回当前接受者的 ack number，已经确认收到了多少字节
     std::optional<WrappingInt32> ackno() const;
 
     //! \brief The window size that should be sent to the peer
@@ -50,6 +55,7 @@ class TCPReceiver {
     //! the first byte that falls after the window (and will not be
     //! accepted by the receiver) and (b) the sequence number of the
     //! beginning of the window (the ackno).
+    // 返回滑动窗口的大小
     size_t window_size() const;
     //!@}
 
@@ -58,6 +64,7 @@ class TCPReceiver {
 
     //! \brief handle an inbound segment
     //! \returns `true` if any part of the segment was inside the window
+    // 接受 TCP 报文
     bool segment_received(const TCPSegment &seg);
 
     //! \name "Output" interface for the reader
