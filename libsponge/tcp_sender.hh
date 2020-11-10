@@ -15,22 +15,37 @@
 //! segments, keeps track of which segments are still in-flight,
 //! maintains the Retransmission Timer, and retransmits in-flight
 //! segments if the retransmission timer expires.
+// 接受字节流，并且将字节流拆分成包，然后发送
 class TCPSender {
   private:
     //! our initial sequence number, the number for our SYN.
-    WrappingInt32 _isn;
+    WrappingInt32 _isn;  // 初始序列，SYN 包的序号
 
     //! outbound queue of segments that the TCPSender wants sent
-    std::queue<TCPSegment> _segments_out{};
+    std::queue<TCPSegment> _segments_out{};  // 要发送的 TCP 包，队列存储
 
     //! retransmission timer for the connection
-    unsigned int _initial_retransmission_timeout;
+    unsigned int _initial_retransmission_timeout;  // 重试时间
 
     //! outgoing stream of bytes that have not yet been sent
-    ByteStream _stream;
+    ByteStream _stream;  // 字节流
 
     //! the (absolute) sequence number for the next byte to be sent
-    uint64_t _next_seqno{0};
+    uint64_t _next_seqno{0};  // 下一个要被发送字节序号
+
+    std::queue<TCPSegment> _segments_outstanding{};  // flight 中的包，发送但未被确认的包，要重传，即飞行中的包
+    size_t _bytes_in_flight = 0;                     // flight 中的字节数
+    size_t _recv_ackno = 0;                          // 收到的确认号
+    bool _syn{};
+    bool _fin{};
+    size_t _window_size = 0;  // 窗口大小
+    size_t _timer = 0;        //
+    bool _timer_running = false;
+    size_t _retransmission_timeout = 0;
+    size_t _consecutive_retransmission = 0;
+
+    // 发送 TCP 包
+    void send_segment(TCPSegment &seg);
 
   public:
     //! Initialize a TCPSender
@@ -54,7 +69,7 @@ class TCPSender {
     void send_empty_segment();
 
     //! \brief create and send segments to fill as much of the window as possible
-    void fill_window();
+    void fill_window(bool send_syn = true);
 
     //! \brief Notifies the TCPSender of the passage of time
     void tick(const size_t ms_since_last_tick);
@@ -66,6 +81,7 @@ class TCPSender {
     //! \brief How many sequence numbers are occupied by segments sent but not yet acknowledged?
     //! \note count is in "sequence space," i.e. SYN and FIN each count for one byte
     //! (see TCPSegment::length_in_sequence_space())
+    // 正在飞行中的字节数，已经发送但未被确认
     size_t bytes_in_flight() const;
 
     //! \brief Number of consecutive retransmissions that have occurred in a row
