@@ -1,6 +1,7 @@
 #ifndef SPONGE_LIBSPONGE_BYTE_STREAM_HH
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
+#include <buffer.hh>
 #include <cstddef>
 #include <cstdint>
 #include <deque>
@@ -17,7 +18,8 @@ class ByteStream {
   private:
     // Your code here -- add private members as necessary.
     size_t _capacity = 0;
-    std::deque<char> _buffer{};
+    // std::deque<char> _buffer{};
+    BufferList _buffer{};
     bool _end_input = false;
     size_t _bytes_read = 0;
     size_t _bytes_write = 0;
