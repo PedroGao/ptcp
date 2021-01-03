@@ -25,12 +25,31 @@ class TCPSender {
 
     //! retransmission timer for the connection
     unsigned int _initial_retransmission_timeout;
+    unsigned int _retransmission_timeout;
 
     //! outgoing stream of bytes that have not yet been sent
     ByteStream _stream;
 
     //! the (absolute) sequence number for the next byte to be sent
-    uint64_t _next_seqno{0};
+    uint64_t _next_seqno{0};  // 绝对序号，syn 和 fin 都需要算一个序列
+
+    //! outstanding 包
+    std::queue<TCPSegment> _outstanding_segments{};
+    //! bytes_in_flight 飞出去的字节数
+    size_t _bytes_in_flight{0};
+    //! consecutive_retransmissions 需要重传包的个数
+    size_t _consecutive_retransmissions{0};
+    uint64_t _recv_ackno{0};
+    int32_t _window_size{-1};  // 默认为 -1，如果接收方有 window_size，则 >=0，未初始化状态下为 -1
+    // 发送方也有 syn 和 fin
+    bool _syn{false};  // 发送 syn
+    bool _fin{false};  // 发送 fin
+    // 时间
+    size_t _time_tick{0};
+    bool _timer{false};
+
+    // 发送包
+    void send_segment(TCPSegment &segment);
 
   public:
     //! Initialize a TCPSender

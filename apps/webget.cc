@@ -17,8 +17,28 @@ void get_URL(const string &host, const string &path) {
     // (not just one call to read() -- everything) until you reach
     // the "eof" (end of file).
 
-    cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
-    cerr << "Warning: get_URL() has not been implemented yet.\n";
+    // Hints:
+    // 1. HTTP 每一行都以 \r\n 结尾
+    // 2. 不要忘记在 header 中加入：Connection: close
+    // 3. 读取和输出所有服务器的数据，在 EOF 之前
+    // 4. 只写 10 行代码即可
+    // 5. 使用 make check_webget 检查代码是否 work
+
+    Address address(host, "http");
+    TCPSocket socket;
+    // 连接远端地址
+    socket.connect(address);
+    string req = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\nAccept: */*\r\n\r\n";
+    // 写入请求 http 数据
+    socket.write(req);
+    // 只写一次，直接关闭 write
+    socket.shutdown(SHUT_WR);
+    // 只要没有 eof 就一直读
+    while (!socket.eof()) {
+        cout << socket.read();
+    }
+    // cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
+    // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }
 
 int main(int argc, char *argv[]) {

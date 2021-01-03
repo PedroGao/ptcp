@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <ostream>
 
+//! seq 的边界，2^32
+const unsigned long SEQ_EDGE = 1ul << 32;
+
 //! \brief A 32-bit integer, expressed relative to an arbitrary initial sequence number (ISN)
 //! \note This is used to express TCP sequence numbers (seqno) and acknowledgment numbers (ackno)
 class WrappingInt32 {

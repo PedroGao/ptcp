@@ -4,6 +4,7 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
+#include <set>
 #include <string>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
@@ -14,6 +15,23 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+
+    struct node {
+        size_t begin = 0;
+        size_t length = 0;
+        std::string data{};
+        //! 通过节点的开始节点来排序节点
+        bool operator<(const node &t) const { return begin < t.begin; }
+    };
+
+    std::set<node> _nodes{};        //! 已接受但未重组的 substring
+    size_t _unassembled_bytes = 0;  //! 未重组的字节数
+    size_t _head_index = 0;         //! 头部节点
+    bool _eof{};                    //! 输入完毕
+
+    long merge(node &node1, const node &node2);  //! 合并两个 node，合并的结果为 node1，return 合并的字节数
+
+    void end_input();  //! output eof
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
@@ -46,6 +64,10 @@ class StreamReassembler {
     //! \brief Is the internal state empty (other than the output stream)?
     //! \returns `true` if no substrings are waiting to be assembled
     bool empty() const;
+
+    //! \brief 已经重组的字节序号
+    //! \returns 已经重组的字节序号
+    size_t head_index() const;
 };
 
 #endif  // SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH

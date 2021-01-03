@@ -1,6 +1,8 @@
 #ifndef SPONGE_LIBSPONGE_BYTE_STREAM_HH
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
+#include "util/buffer.hh"
+
 #include <string>
 
 //! \brief An in-order byte stream.
@@ -17,7 +19,12 @@ class ByteStream {
     // that's a sign that you probably want to keep exploring
     // different approaches.
 
-    bool _error{};  //!< Flag indicating that the stream suffered an error.
+    bool _error{};          //!< Flag indicating that the stream suffered an error.
+    bool _input_ended{};    //!< 停止输入
+    size_t _bytes_write{};  //!< 已写字节数
+    size_t _bytes_read{};   //!< 已读字节数
+    size_t _capacity{};     //!< 容量
+    BufferList _buffer{};   //!< 缓存数据
 
   public:
     //! Construct a stream with room for `capacity` bytes.
@@ -61,13 +68,13 @@ class ByteStream {
     //! \returns `true` if the stream has suffered an error
     bool error() const { return _error; }
 
-    //! \returns the maximum amount that can currently be read from the stream
+    //! \returns the maximum amount that can currently be read from the stream // 可以读的数据
     size_t buffer_size() const;
 
-    //! \returns `true` if the buffer is empty
+    //! \returns `true` if the buffer is empty 可读数据为零
     bool buffer_empty() const;
 
-    //! \returns `true` if the output has reached the ending
+    //! \returns `true` if the output has reached the ending  输出到结尾了
     bool eof() const;
     //!@}
 
