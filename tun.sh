@@ -55,7 +55,7 @@ check_tun () {
 check_sudo () {
     if [ "$SUDO_USER" = "root" ]; then
         echo "please execute this script as a regular user, not as root"
-        exit 1
+        # exit 1
     fi
     if [ -z "$SUDO_USER" ]; then
         # if the user didn't call us with sudo, re-execute

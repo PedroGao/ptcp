@@ -20,6 +20,16 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+    size_t _time_since_last_segment_received{0};
+    bool _active{true};     // tcp 构造时默认处于激活状态
+    bool _sent_rst{false};  // 对外发送 rst
+
+    bool in_listen();  // 参考文档或者 tcp state
+    bool in_syn_recv();
+    bool in_syn_sent();
+    void send_segment();
+    void send_rst_segment();  // 发送 rst 包
+    void reset_linger();      // 重置 linger
 
   public:
     //! \name "Input" interface for the writer
