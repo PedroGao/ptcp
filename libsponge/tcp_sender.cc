@@ -100,7 +100,7 @@ bool TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     }
     // 这个地方为什么需要在接受包以后立马又发送包呢？
     // 必须得，因为这就是交互逻辑，单元测试里面大量测试没有直接 fill_window，而是调用 ack_received
-    fill_window();
+    // fill_window();  // 这个地方不需要 fill_window，sender 将 fill_window 的决定权交给了 connection
     _retransmission_timeout = _initial_retransmission_timeout;
     _consecutive_retransmissions = 0;
     if (!_outstanding_segments.empty()) {

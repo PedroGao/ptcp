@@ -38,6 +38,7 @@ int main() {
             size_t sendoff = 0;
             while (sendoff < d.size()) {
                 const size_t len = min(d.size() - sendoff, static_cast<size_t>(rd()) % 8192);
+                cout << "len: " << len << endl;
                 if (len == 0) {
                     continue;
                 }
@@ -48,6 +49,7 @@ int main() {
                 test_1.execute(ExpectSegmentAvailable{}, "test 1 failed: cannot read after write()");
 
                 size_t n_segments = ceil(double(len) / TCPConfig::MAX_PAYLOAD_SIZE);
+                cout << "n_segments: " << n_segments << endl;
                 size_t bytes_remaining = len;
 
                 // Transfer the data segments

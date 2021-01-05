@@ -51,7 +51,8 @@ static void ack_rst_syn_sent_test(const TCPConfig &cfg,
 int main() {
     try {
         TCPConfig cfg{};
-        const WrappingInt32 base_seq(1 << 31);
+        // const WrappingInt32 base_seq(1 << 31);
+        const WrappingInt32 base_seq(1 << 25);
 
         // test #1: in ESTABLISHED, send unacceptable segments and ACKs
         {
@@ -83,8 +84,9 @@ int main() {
             test_1.execute(ExpectOneSegment{}.with_ack(true).with_ackno(base_seq), "test 1 failed: bad ACK");
 
             // segment out of the window---should get an ACK
+            // seqno 超过了 window_size 则直接返回
             cout << "start log" << endl;
-            test_1.send_byte(base_seq + cfg.recv_capacity, base_seq, 1);
+            test_1.send_byte((base_seq + cfg.recv_capacity), base_seq, 1);
             cout << "end log" << endl;
             test_1.execute(ExpectUnassembledBytes{0}, "test 1 failed: seg queued on late seqno");
             test_1.execute(ExpectOneSegment{}.with_ack(true).with_ackno(base_seq),

@@ -118,7 +118,6 @@ void TCPTestHarness::send_syn(const WrappingInt32 seqno, const optional<Wrapping
 //! \param[in] ackno is the optional acknowledgment number of the segment; if no value, ACK flag is not set
 //! \param[in] val is the value of the one-byte payload
 void TCPTestHarness::send_byte(const WrappingInt32 seqno, const optional<WrappingInt32> ackno, const uint8_t val) {
-    cout << "seqno: " << seqno.raw_value() << " ackno: " << ackno.has_value() << endl;
     SendSegment step{};
     if (ackno.has_value()) {
         step.with_ack(true).with_ackno(ackno.value());
@@ -144,7 +143,6 @@ void TCPTestHarness::send_data(const WrappingInt32 seqno, const WrappingInt32 ac
 
 void TCPTestHarness::execute(const TCPTestStep &step, std::string note) {
     try {
-        cout << "exe: \n" << step.to_string() << endl;
         step.execute(*this);
         while (not _fsm.segments_out().empty()) {
             _flt.write(_fsm.segments_out().front());

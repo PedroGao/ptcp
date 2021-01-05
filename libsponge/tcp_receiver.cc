@@ -11,15 +11,17 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 bool TCPReceiver::segment_received(const TCPSegment &seg) {
-    if (seg.header().syn && _syn) {
+    auto header = seg.header();
+    auto payload = seg.payload();
+    if (header.syn && _syn) {
         // 在已经收到 syn 的情况下，再次收到 syn 包，直接丢弃包
         return false;
     }
     bool first_syn = false;
-    if (seg.header().syn) {
+    if (header.syn) {
         _syn = true;
         _abs_seqno = 1;  // syn 消耗一个序号，这个地方很重要，_abs_seqno 是计算后面 _abs_seqno 的重要根据
-        _isn = seg.header().seqno;
+        _isn = header.seqno;
         first_syn = true;
     }
     // 没有 syn 的包全部拒绝
@@ -27,15 +29,19 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return false;
     }
     // 判断有没有多次 fin
-    if (seg.header().fin && _fin) {
+    if (header.fin && _fin) {
         return false;
     }
     // 只有在包没有任何问题的情况下，才能计算 abs_seqno，不然 abs_seqno 会被其它包污染
     // 当前包的 abs_seqno，如果是 fin 包，此处已经根据 seqno 计算而来
     if (!first_syn) {
         // 当前包的 abs seqno
-        uint64_t cur = unwrap(seg.header().seqno, _isn, _abs_seqno);
+        uint64_t cur = unwrap(header.seqno, _isn, _abs_seqno);
         if (cur == 0) {  // 如果再已经 syn 的情况下还是 0 则直接返回
+            return false;
+        }
+        // 判断 cur 与 _abs_seqno 之间的大小，如果超过了 window_size 则拒绝
+        if (_abs_seqno + window_size() <= cur) {
             return false;
         }
         _abs_seqno = cur;
@@ -43,15 +49,15 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     // 结束包
     // 这里有一个终极大 BUG，如果 fin 包提前到达，那么比 fin 包序号小的包还未达到，但也应该被接收
     // 所以这里还需要判断
-    if (seg.header().fin) {
+    if (header.fin) {
         _fin = true;
         _abs_seqno += 1;  // fin 也消耗一个字节
     }
     // 加入数据，此处的 index 可以由 abs_seqno 计算而得
     // 因为 fin 包的存在，所以即使没有数据，也要 push
     // 注意：如果当前是 fin 包，那么需要减一，其它情况均不需要
-    size_t index = _abs_seqno - (_syn ? 1 : 0) - (seg.header().fin ? 1 : 0);
-    _reassembler.push_substring(seg.payload().copy(), index, seg.header().fin);
+    size_t index = _abs_seqno - (_syn ? 1 : 0) - (header.fin ? 1 : 0);
+    _reassembler.push_substring(payload.copy(), index, header.fin);
     return true;
 }
 
