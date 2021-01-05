@@ -28,10 +28,10 @@ uint64_t TCPSender::bytes_in_flight() const {
     return _bytes_in_flight;
 }
 
-void TCPSender::fill_window() {
+void TCPSender::fill_window(bool send_syn) {
     // 读取数据装包，并发包
     // 首先要发送一个 SYN 包
-    if (!_syn) {
+    if (!_syn && send_syn) {
         _syn = true;
         TCPSegment seg;
         seg.header().syn = true;

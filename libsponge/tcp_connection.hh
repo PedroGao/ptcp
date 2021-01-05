@@ -20,12 +20,14 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
-    size_t _time_since_last_segment_received{0};
-    bool _end_before_fin{false};
-    
-    void ask_receiver(TCPSegment &ongoing_seg) const;
-    void send_out();
-    void do_reset(bool send = true);
+    size_t _time_since_last_segment_received = 0;  // 最后一次收到 TCP 报文到现在的时间
+    bool _active = true;                           // 当前状态
+    bool _need_send_rst = false;                   // 是否需要发送 rst
+    bool _ack_for_fin_sent = false;                // 是否需要向对端发送 FIN 包
+
+    bool push_segments_out(bool send_syn = false);  // 发送 TCP 报文
+    void unclean_shutdown(bool send_rst);
+    bool clean_shutdown();
 
   public:
     //! \name "Input" interface for the writer
