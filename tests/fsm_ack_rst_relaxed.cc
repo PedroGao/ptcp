@@ -83,8 +83,9 @@ int main() {
             test_1.execute(ExpectOneSegment{}.with_ack(true).with_ackno(base_seq), "test 1 failed: bad ACK");
 
             // segment out of the window---should get an ACK
+            cout << "start log" << endl;
             test_1.send_byte(base_seq + cfg.recv_capacity, base_seq, 1);
-
+            cout << "end log" << endl;
             test_1.execute(ExpectUnassembledBytes{0}, "test 1 failed: seg queued on late seqno");
             test_1.execute(ExpectOneSegment{}.with_ack(true).with_ackno(base_seq),
                            "test 1 failed: bad ACK on late seqno");

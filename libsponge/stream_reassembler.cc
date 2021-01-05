@@ -25,7 +25,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         _eof = eof;  // 不管怎么样，先搞定 eof
     }
     // 当前字符串的末尾序号已经被重组了，则直接返回
-    if (index + sz < _head_index) {
+    if (sz == 0 || index + sz < _head_index) {
         end_input();
         return;
     }

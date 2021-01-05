@@ -72,17 +72,17 @@ void TCPSender::fill_window() {
 
 //! \param ackno The remote receiver's ackno (acknowledgment number)
 //! \param window_size The remote receiver's advertised window size
-void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
+bool TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
     // 算出包的 abs_ackno
     uint64_t abs_ackno = unwrap(ackno, _isn, _recv_ackno);
     // 这个包无法确认，累积确认，必须按照顺序一步一步来
     if (abs_ackno > _next_seqno) {
-        return;  // 无需确认
+        return false;  // 无需确认
     }
     // 最新的 window_size 得确认
     _window_size = window_size;
     if (abs_ackno <= _recv_ackno) {  // 注意，如果是等于，那么其实也已经确认过了
-        return;                      // 已经确认过，无法再次确认
+        return true;                 // 已经确认过，无法再次确认
     }
     _recv_ackno = abs_ackno;  // 更新 recv_ack
     // 更新确认包以后，删除 _outstanding_segments 中的确认包
@@ -107,6 +107,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
         _timer = true;
         _time_tick = 0;
     }
+    return true;
 }
 
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
