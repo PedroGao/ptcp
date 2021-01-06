@@ -40,7 +40,7 @@ class TCPSender {
     //! consecutive_retransmissions 需要重传包的个数
     size_t _consecutive_retransmissions{0};
     uint64_t _recv_ackno{0};
-    int32_t _window_size{-1};  // 默认为 -1，如果接收方有 window_size，则 >=0，未初始化状态下为 -1
+    int64_t _window_size{-1};  // 默认为 -1，如果接收方有 window_size，则 >=0，未初始化状态下为 -1
     // 发送方也有 syn 和 fin
     bool _syn{false};  // 发送 syn
     bool _fin{false};  // 发送 fin

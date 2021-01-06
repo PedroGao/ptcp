@@ -20,6 +20,78 @@ StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity),
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
     // 重组完毕的 substring 再输入到 _output 中
     // 判断是否超过的 capacity
+    // size_t sz = data.size();
+    // if (eof) {
+    //     _eof = eof;  // 不管怎么样，先搞定 eof
+    // }
+    // // 当前字符串的末尾序号已经被重组了，则直接返回
+    // if (sz == 0 || index + sz < _head_index) {
+    //     end_input();
+    //     return;
+    // }
+    // node cur;
+    // if (index < _head_index) {
+    //     // 截取有用的后半部分
+    //     size_t offset = _head_index - index;
+    //     cur.begin = _head_index;
+    //     cur.length = sz - offset;
+    //     cur.data = data.substr(offset);
+    // } else {
+    //     cur.begin = index;
+    //     cur.data = data;
+    //     cur.length = sz;
+    // }
+    // _unassembled_bytes += cur.length;
+    // // 合并字节
+    // // 二分查找，返回第一个大于等于 cur_node.begin 的节点，如果没找到，返回末尾的迭代器位置
+    // // 向后合并，cur.begin = 90  next.begin = 100
+    // long merged_bytes = 0;
+    // while (true) {
+    //     auto next = _nodes.lower_bound(cur);
+    //     if (next == _nodes.end()) {
+    //         break;
+    //     }
+    //     // 合并 cur 和 next
+    //     long m = merge(cur, *next);
+    //     if (m < 0) {
+    //         // 无合并
+    //         break;
+    //     }
+    //     // 有合并，删除已经合并的 next 节点
+    //     _nodes.erase(next);
+    //     merged_bytes += m;
+    // }
+    // auto iter = _nodes.lower_bound(cur);
+    // // 向前合并
+    // // 如果已经是第一个节点了，同时也是当前节点，则已经不用向前合并了
+    // while (iter != _nodes.begin()) {
+    //     // 否则 iter--，得到前面一个节点进行合并
+    //     iter--;
+    //     long m = merge(cur, *iter);
+    //     if (m < 0) {
+    //         // 无合并
+    //         break;
+    //     }
+    //     // 有合并，删除已经合并的 next 节点
+    //     _nodes.erase(iter);
+    //     merged_bytes += m;
+    //     iter = _nodes.lower_bound(cur);
+    // }
+    // _unassembled_bytes -= merged_bytes;
+    // // 插入 cur
+    // _nodes.insert(cur);
+    // while (!_nodes.empty() && _nodes.begin()->begin == _head_index) {
+    //     auto begin = _nodes.begin();
+    //     size_t written = _output.write(begin->data);
+    //     _head_index += written;
+    //     _unassembled_bytes -= written;
+    //     // 删除已经写入的头节点
+    //     _nodes.erase(begin);
+    // }
+    // end_input();
+
+    // 重组完毕的 substring 再输入到 _output 中
+    // 判断是否超过的 capacity
     size_t sz = data.size();
     if (eof) {
         _eof = eof;  // 不管怎么样，先搞定 eof
