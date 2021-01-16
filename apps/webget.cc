@@ -1,4 +1,5 @@
-#include "socket.hh"
+// #include "socket.hh"
+#include "tcp_sponge_socket.hh"
 #include "util.hh"
 
 #include <cstdlib>
@@ -25,7 +26,7 @@ void get_URL(const string &host, const string &path) {
     // 5. 使用 make check_webget 检查代码是否 work
 
     Address address(host, "http");
-    TCPSocket socket;
+    CS144TCPSocket socket;
     // 连接远端地址
     socket.connect(address);
     string req = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\nAccept: */*\r\n\r\n";
@@ -37,6 +38,7 @@ void get_URL(const string &host, const string &path) {
     while (!socket.eof()) {
         cout << socket.read();
     }
+    socket.wait_until_closed();
     // cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
     // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }

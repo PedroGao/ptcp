@@ -21,38 +21,27 @@ ByteStream::ByteStream(const size_t capacity) : _capacity(capacity) {}
 
 size_t ByteStream::write(const string &data) {
     // 注意：这里是多少可写，所以是均衡后的数据
-    size_t size = min(data.size(), remaining_capacity());
-    string s = string{}.assign(data.begin(), data.begin() + size);
-    BufferList buf{move(s)};
-    _buffer.append(buf);
-    _bytes_write += size;
-    return size;
+    size_t len = data.size();
+    size_t will_write = std::min(len, remaining_capacity());
+    string s = string().assign(data.begin(), data.begin() + will_write);
+    _buffer.append(BufferList(move(s)));
+    _bytes_write += will_write;
+    return will_write;
 }
 
 //! \param[in] len bytes will be copied from the output side of the buffer
 string ByteStream::peek_output(const size_t len) const {
-    std::string ret;
-    size_t sz = min(len, buffer_size());
-    ret.reserve(sz);
-    for (const auto &buf : _buffer.buffers()) {
-        if (sz <= 0)
-            break;
-        if (sz >= buf.size()) {
-            ret.append(string(buf.str()));
-        } else {
-            // 当 sz 的大小小于 buf size，则只需要 append 前面的 sz 大小
-            ret.append(string(buf.str()).substr(0, sz));
-        }
-    }
-    return ret;
+    size_t length = std::min(len, _buffer.size());
+    const string s = _buffer.concatenate();
+    return string().assign(s.begin(), s.begin() + length);
 }
 
 //! \param[in] len bytes will be removed from the output side of the buffer
 void ByteStream::pop_output(const size_t len) {
     // 注意：这里是有多少字节可读，所有就是 buffer 的容量
-    size_t sz = min(len, buffer_size());
-    _buffer.remove_prefix(sz);
-    _bytes_read += sz;
+    size_t length = std::min(len, _buffer.size());
+    _buffer.remove_prefix(length);
+    _bytes_read += length;
 }
 
 //! Read (i.e., copy and then pop) the next "len" bytes of the stream
