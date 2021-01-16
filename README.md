@@ -9,7 +9,8 @@
 - [TCPReceiver](./writeups/lab2.md)
 - [TCPSender](./writeups/lab3.md)
 - [TCPConnection](./writeups/lab4.md)
-- [TCPConnection](./writeups/lab4.md)
+- [NetworkInterface](./writeups/lab5.md)
+- [Router](./writeups/lab6.md)
 
 **完整笔记见代码注释~**
 

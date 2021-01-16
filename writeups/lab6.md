@@ -1,25 +1,5 @@
-Lab 6 Writeup
-=============
+# Lab 6 Writeup
 
-My name: [your name here]
+实现 IP 路由协议，遵循最长匹配原则。
 
-My SUNet ID: [your sunetid here]
-
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
-
-Program Structure and Design of the Router:
-[]
-
-Implementation Challenges:
-[]
-
-Remaining Bugs:
-[]
-
-- Optional: I had unexpected difficulty with: [describe]
-
-- Optional: I think you could make this lab better by: [describe]
-
-- Optional: I was surprised by: [describe]
-
-- Optional: I'm not sure about: [describe]
+只有当 next_hop 为空的时候代表该路由器为目的路由器，此时 next_hop 取 dgram 的目的 IP 地址
